@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard | CareSync{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light py-4 min-vh-100">
+    <div class="row w-100 mx-auto" style="max-width: 1400px;">
+        <!-- Sidebar Profile -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center p-4">
+                    <img src="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=0d6efd&color=fff&size=100" class="rounded-circle mb-3 shadow-sm" alt="Doctor Profile">
+                    <h4 class="fw-bold mb-1">Dr. Sarah Jenkins</h4>
+                    <span class="badge bg-primary-light text-primary mb-3">General Medicine</span>
+                    
+                    <hr class="text-muted opacity-25">
+                    
+                    <div class="text-start px-2 small">
+                        <p class="mb-2"><i class="fa-solid fa-door-open text-muted me-2 border p-1 rounded"></i> Room 102</p>
+                        <p class="mb-2"><i class="fa-regular fa-clock text-muted me-2 border p-1 rounded"></i> 09:00 AM - 05:00 PM</p>
+                        <p class="mb-0"><i class="fa-solid fa-clipboard-check text-muted me-2 border p-1 rounded"></i> Total Seen: 45 today</p>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <label class="form-label small fw-bold text-muted w-100 text-start">Availability Status</label>
+                        <select class="form-select form-select-sm" id="doctor-status">
+                            <option value="available" selected>🟢 Available / Seeing Patients</option>
+                            <option value="break">🟡 On Break / Lunch</option>
+                            <option value="emergency">🔴 Attending Emergency</option>
+                            <option value="offline">⚪ Off Duty</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-9">
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-primary text-white">
+                        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="opacity-75 mb-0">Live Queue</h6>
+                                <h2 class="fw-bold mb-0">12</h2>
+                            </div>
+                            <i class="fa-solid fa-users fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm bg-success text-white">
+                        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="opacity-75 mb-0">Appointments Today</h6>
+                                <h2 class="fw-bold mb-0">8</h2>
+                            </div>
+                            <i class="fa-solid fa-calendar-check fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted mb-0">Average Consult Time</h6>
+                                <h2 class="fw-bold text-dark mb-0">10m</h2>
+                            </div>
+                            <i class="fa-solid fa-stopwatch fa-2x text-muted opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tabs -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3 pb-0">
+                    <ul class="nav nav-tabs border-bottom-0" id="docTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-medium pb-3" data-bs-toggle="tab" data-bs-target="#live-queue" type="button" role="tab">Live Token Queue</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-medium pb-3" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab">Appointments</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-0">
+                    <div class="tab-content" id="docTabsContent">
+                        
+                        <!-- Queue Tab -->
+                        <div class="tab-pane fade show active" id="live-queue" role="tabpanel">
+                            <!-- Current Patient Widget -->
+                            <div class="bg-primary-light p-4 border-bottom">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <span class="badge bg-primary mb-2">Currently Serving</span>
+                                        <h3 class="fw-bold mb-1">#GEN-22 : Rahul Sharma</h3>
+                                        <p class="text-muted mb-0 small">Age: 32 • Gender: Male • Symptoms: High Fever</p>
+                                    </div>
+                                    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                                        <button class="btn btn-outline-secondary me-2" data-bs-toggle="modal" data-bs-target="#viewRecordsModal"><i class="fa-solid fa-file-medical me-1"></i> Records</button>
+                                        <button class="btn btn-success" onclick="finishConsultation()"><i class="fa-solid fa-check-double me-1"></i> Finish & Next</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Queue List -->
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light text-muted small">
+                                        <tr>
+                                            <th class="ps-4">Token</th>
+                                            <th>Patient Name</th>
+                                            <th>Est. Wait</th>
+                                            <th>Status</th>
+                                            <th class="pe-4 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="queue-list">
+                                        <tr>
+                                            <td class="ps-4 fw-bold text-primary">#GEN-23</td>
+                                            <td class="fw-medium">Anita Desai</td>
+                                            <td><span class="badge bg-warning text-dark">Next</span></td>
+                                            <td>Waiting in Lobby</td>
+                                            <td class="pe-4 text-end">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="alert('Calling patient #GEN-23')"><i class="fa-solid fa-bullhorn"></i> Call</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4 fw-bold">#GEN-24</td>
+                                            <td class="fw-medium">Vikram Singh</td>
+                                            <td class="text-muted">~ 10 mins</td>
+                                            <td>Waiting in Lobby</td>
+                                            <td class="pe-4 text-end">
+                                                <button class="btn btn-sm btn-light border"><i class="fa-solid fa-ellipsis"></i></button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4 fw-bold">#GEN-25</td>
+                                            <td class="fw-medium">Priya Patel</td>
+                                            <td class="text-muted">~ 20 mins</td>
+                                            <td>Waiting in Lobby</td>
+                                            <td class="pe-4 text-end">
+                                                <button class="btn btn-sm btn-light border"><i class="fa-solid fa-ellipsis"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Appointments Tab -->
+                        <div class="tab-pane fade" id="appointments" role="tabpanel">
+                            <div class="p-4 bg-light border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold">Schedule for Oct 15, 2026</h6>
+                                <input type="date" class="form-control form-control-sm w-auto" value="2026-10-15">
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <tbody id="appts-list">
+                                        <!-- Slot -->
+                                        <tr>
+                                            <td class="ps-4" style="width: 120px;">
+                                                <span class="badge bg-light text-dark border">10:00 AM</span>
+                                            </td>
+                                            <td>
+                                                <div class="fw-medium">John Doe <span class="badge bg-secondary ms-2 small">APT7729</span></div>
+                                                <div class="small text-muted">Follow-up checkup</div>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <button class="btn btn-sm btn-outline-primary">Start Consult</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="ps-4">
+                                                <span class="badge bg-light text-dark border">11:30 AM</span>
+                                            </td>
+                                            <td>
+                                                <div class="fw-medium">Meera Reddy <span class="badge bg-secondary ms-2 small">APT4309</span></div>
+                                                <div class="small text-muted">New Patient - Viral symptoms</div>
+                                            </td>
+                                            <td class="pe-4 text-end">
+                                                <button class="btn btn-sm btn-outline-primary">Start Consult</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Records Modal (for Doctors) -->
+<div class="modal fade" id="viewRecordsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Patient Records: Rahul Sharma</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <h6>Past Consultations</h6>
+                <div class="bg-light p-3 rounded mb-4">
+                    <p class="small text-muted mb-1">Aug 10, 2026 - Dr. Sarah Jenkins</p>
+                    <p class="mb-0 small"><strong>Diagnosis:</strong> Dengue Fever. Complete rest advised.</p>
+                </div>
+                
+                <h6>Upload New Prescription</h6>
+                <form>
+                    <div class="mb-3">
+                        <textarea class="form-control mb-2" rows="4" placeholder="Type prescription or notes here..."></textarea>
+                        <input class="form-control form-control-sm" type="file" title="Upload written Rx PDF">
+                    </div>
+                    <button type="button" class="btn btn-primary btn-sm">Save to Patient Record</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function finishConsultation() {
+        alert("Consultation finished. Calling next patient #GEN-23.");
+        // Simulated UI update
+        const queueList = document.getElementById('queue-list');
+        if(queueList.children.length > 0) {
+            queueList.removeChild(queueList.children[0]);
+        }
+    }
+</script>
+{% endblock %}

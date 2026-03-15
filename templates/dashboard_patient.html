@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% block title %}Patient Dashboard | CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Area -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1">Departments & Doctors</h2>
+            <p class="text-muted mb-0">Select a department to view doctors, generate tokens, or book appointments.</p>
+        </div>
+        <div>
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" class="form-control border-start-0" id="search-input" placeholder="Search department or doctor...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Token Widget (Placeholder for data fetch) -->
+    <div class="card bg-primary text-white border-0 shadow-sm mb-5 d-none" id="active-token-card">
+        <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <div class="bg-white text-primary rounded-circle d-flex justify-content-center align-items-center me-4" style="width: 60px; height: 60px;">
+                    <i class="fa-solid fa-ticket fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Active Token: #OPD-24</h5>
+                    <p class="mb-0 opacity-75">General Medicine - Dr. Sarah Jenkins</p>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="mb-1"><span class="badge bg-white text-primary">Est. Waiting: 15 mins</span></div>
+                <small class="opacity-75">Room 102</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Departments Grid -->
+    <div class="row g-4" id="departments-container">
+        <!-- These will be generated dynamically, but we'll put static layout for now based on requirements -->
+        
+        <!-- Department 1 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="OPD" data-doctor="Dr. John Doe">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">OPD</span>
+                        <small class="text-success"><i class="fa-solid fa-circle fa-2xs me-1"></i> Available</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. John Doe</h4>
+                    <p class="text-muted small mb-3">MBBS, MD - General Medicine</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 09:00 AM - 02:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 101, First Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: #12</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary fw-medium" onclick="generateToken('OPD', 'Dr. John Doe')">
+                            Generate Token (Walk-in)
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=OPD&doc=Dr_John_Doe" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department 2 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="Orthopedic" data-doctor="Dr. Michael Smith">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">Orthopedic</span>
+                        <small class="text-success"><i class="fa-solid fa-circle fa-2xs me-1"></i> Available</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. Michael Smith</h4>
+                    <p class="text-muted small mb-3">MS Orthopedics (Bone & Joint)</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 10:00 AM - 04:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 205, Second Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: #5</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary fw-medium" onclick="generateToken('Orthopedic', 'Dr. Michael Smith')">
+                            Generate Token (Walk-in)
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=Orthopedic&doc=Dr_Michael_Smith" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department 3 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="Dermatology" data-doctor="Dr. Emily Chen">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">Dermatology (Skin)</span>
+                        <small class="text-muted"><i class="fa-regular fa-circle-pause fa-xs me-1"></i> Lunch Break</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. Emily Chen</h4>
+                    <p class="text-muted small mb-3">MD Dermatology, Venereology</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 09:00 AM - 01:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 302, Third Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: PAUSED</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary fw-medium" disabled>
+                            Generate Token (Walk-in)
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=Dermatology&doc=Dr_Emily_Chen" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department 4 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="Gynecology" data-doctor="Dr. Lisa Wong">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">Gynecology</span>
+                        <small class="text-success"><i class="fa-solid fa-circle fa-2xs me-1"></i> Available</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. Lisa Wong</h4>
+                    <p class="text-muted small mb-3">MD Obstetrics & Gynecology</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 08:00 AM - 03:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 110, First Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: #28</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary fw-medium" onclick="generateToken('Gynecology', 'Dr. Lisa Wong')">
+                            Generate Token (Walk-in)
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=Gynecology&doc=Dr_Lisa_Wong" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department 5 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="General Medicine" data-doctor="Dr. Sarah Jenkins">
+            <div class="card h-100 border-0 shadow-sm border-primary">
+                <!-- Highlighted card to show they have an active token -->
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">General Medicine</span>
+                        <small class="text-success"><i class="fa-solid fa-circle fa-2xs me-1"></i> Available</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. Sarah Jenkins</h4>
+                    <p class="text-muted small mb-3">MD Internal Medicine</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 09:00 AM - 05:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 102, First Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: #22</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-secondary fw-medium" disabled>
+                            Token Already Active
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=General_Medicine&doc=Dr_Sarah_Jenkins" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Department 6 -->
+        <div class="col-md-6 col-lg-4 dept-card" data-dept="Pediatrics" data-doctor="Dr. Robert Taylor">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary-light text-primary py-2 px-3 rounded-pill">Pediatrics</span>
+                        <small class="text-success"><i class="fa-solid fa-circle fa-2xs me-1"></i> Available</small>
+                    </div>
+                </div>
+                <div class="card-body pt-3">
+                    <h4 class="fw-bold mb-0">Dr. Robert Taylor</h4>
+                    <p class="text-muted small mb-3">MD Pediatrics (Child Specialist)</p>
+                    
+                    <ul class="list-unstyled small text-muted mb-4">
+                        <li class="mb-2"><i class="fa-regular fa-clock me-2 text-primary"></i> 11:00 AM - 04:00 PM</li>
+                        <li class="mb-2"><i class="fa-solid fa-door-open me-2 text-primary"></i> Room 201, Second Floor</li>
+                        <li><i class="fa-solid fa-users me-2 text-primary"></i> Current Serving: #8</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary fw-medium" onclick="generateToken('Pediatrics', 'Dr. Robert Taylor')">
+                            Generate Token (Walk-in)
+                        </button>
+                        <a href="{{ url_for('book_appointment') }}?dept=Pediatrics&doc=Dr_Robert_Taylor" class="btn btn-primary fw-medium">
+                            Book Slot
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Token Generation Modal -->
+<div class="modal fade" id="tokenGenerateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="mb-4">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fa-solid fa-check fs-1"></i>
+                    </div>
+                    <h3 class="fw-bold">Token Generated!</h3>
+                    <p class="text-muted" id="modal-dept-doc">General Medicine - Dr. Sarah</p>
+                </div>
+                
+                <div class="bg-light rounded p-3 mb-4">
+                    <p class="text-muted mb-1 small">Your Token Number</p>
+                    <h1 class="text-primary fw-bold mb-0 display-4" id="modal-token-num">#OPD-25</h1>
+                    <div class="mt-3 d-flex justify-content-between text-muted small px-3">
+                        <span>Current serving: <strong id="modal-current">22</strong></span>
+                        <span>Est. Wait: <strong>15 mins</strong></span>
+                    </div>
+                </div>
+                
+                <p class="small text-muted mb-4">You will receive a notification when your turn approaches. Please proceed to the waiting area near the room.</p>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary py-2" data-bs-dismiss="modal">View My Tokens</button>
+                    <a href="{{ url_for('hospital_map') }}" class="btn btn-outline-secondary py-2">Navigate to Room</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Search functionality
+    document.getElementById('search-input').addEventListener('keyup', function(e) {
+        const term = e.target.value.toLowerCase();
+        const cards = document.querySelectorAll('.dept-card');
+        
+        cards.forEach(card => {
+            const dept = card.getAttribute('data-dept').toLowerCase();
+            const doc = card.getAttribute('data-doctor').toLowerCase();
+            
+            if(dept.includes(term) || doc.includes(term)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // Token Generation Simulation
+    function generateToken(dept, doc) {
+        // In a real app, this would be an API call to Flask/Firebase
+        
+        // Populate modal
+        document.getElementById('modal-dept-doc').textContent = `${dept} - ${doc}`;
+        
+        // Generate random token for demo
+        const prefix = dept.substring(0, 3).toUpperCase();
+        const num = Math.floor(Math.random() * 50) + 10;
+        document.getElementById('modal-token-num').textContent = `#${prefix}-${num}`;
+        document.getElementById('modal-current').textContent = num - (Math.floor(Math.random() * 5) + 1);
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('tokenGenerateModal'));
+        modal.show();
+        
+        // Optional: Save to Firestore if user logged in
+        if (typeof appAuth !== 'undefined' && appAuth.currentUser) {
+            if (typeof appDb !== 'undefined') {
+                appDb.collection("tokens").add({
+                    userId: appAuth.currentUser.uid,
+                    department: dept,
+                    doctor: doc,
+                    tokenNumber: `${prefix}-${num}`,
+                    status: 'waiting',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(err => console.error("Error saving token:", err));
+            }
+        }
+    }
+    
+    // Check Auth State on layout load
+    document.addEventListener('DOMContentLoaded', () => {
+        if(typeof appAuth !== 'undefined') {
+            appAuth.onAuthStateChanged((user) => {
+                if(!user) {
+                    // Optional: enforce login
+                    // window.location.href = "{{ url_for('login') }}";
+                } else {
+                    // Show active token widget
+                    document.getElementById('active-token-card').classList.remove('d-none');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

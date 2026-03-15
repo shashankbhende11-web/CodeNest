@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Map Navigation | CareSync{% endblock %}
+
+{% block extra_head %}
+<style>
+    #hospital-map {
+        height: 600px;
+        width: 100%;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .map-container {
+        position: relative;
+    }
+    .map-overlay-card {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        width: 320px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
+    }
+    @media (max-width: 768px) {
+        .map-overlay-card {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        #hospital-map {
+            height: 400px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-md-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        <div>
+            <h2 class="fw-bold mb-1">Hospital Navigation</h2>
+            <p class="text-muted mb-0">Find your way to departments, doctor's rooms, and facilities.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="map-container">
+                <!-- Interactive Map Overlay Panel -->
+                <div class="card border-0 shadow map-overlay-card">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-route text-primary me-2"></i>Find Location</h5>
+                        
+                        <div class="input-group mb-4">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" id="map-search" placeholder="Search department or room...">
+                        </div>
+                        
+                        <h6 class="fw-bold small text-muted mb-2 text-uppercase">Quick Select</h6>
+                        <ul class="list-group list-group-flush mb-4 scrollarea" style="max-height: 250px; overflow-y: auto;" id="dept-list">
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6139" data-lng="77.2090" data-room="101" data-floor="1">
+                                <div>
+                                    <div class="fw-medium">OPD</div>
+                                    <small class="text-muted">Room 101, Floor 1</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6142" data-lng="77.2085" data-room="205" data-floor="2">
+                                <div>
+                                    <div class="fw-medium">Orthopedic</div>
+                                    <small class="text-muted">Room 205, Floor 2</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6135" data-lng="77.2095" data-room="302" data-floor="3">
+                                <div>
+                                    <div class="fw-medium">Dermatology</div>
+                                    <small class="text-muted">Room 302, Floor 3</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6138" data-lng="77.2082" data-room="110" data-floor="1">
+                                <div>
+                                    <div class="fw-medium">Gynecology</div>
+                                    <small class="text-muted">Room 110, Floor 1</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6145" data-lng="77.2100" data-room="102" data-floor="1">
+                                <div>
+                                    <div class="fw-medium">General Medicine</div>
+                                    <small class="text-muted">Room 102, Floor 1</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                            <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center dept-item" data-lat="28.6130" data-lng="77.2088" data-room="201" data-floor="2">
+                                <div>
+                                    <div class="fw-medium">Pediatrics</div>
+                                    <small class="text-muted">Room 201, Floor 2</small>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-muted small"></i>
+                            </button>
+                        </ul>
+                        
+                        <div id="route-info" class="d-none mt-3 p-3 bg-primary-light rounded">
+                            <h6 class="fw-bold mb-1 text-primary"><i class="fa-solid fa-location-arrow me-2"></i>Route Active</h6>
+                            <p class="small text-muted mb-0" id="route-desc">From: Main Entrance<br>To: <span id="route-target" class="fw-bold"></span></p>
+                            <button class="btn btn-sm btn-outline-danger mt-2 w-100" id="clear-route">Clear Route</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- The Google Map Div -->
+                <div id="hospital-map"></div>
+                
+                {% if not maps_api_key or maps_api_key == 'your_google_maps_api_key_here' %}
+                <div class="alert alert-warning position-absolute bottom-0 start-50 translate-middle-x mb-3 shadow z-3 w-75 text-center">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                    <strong>Development Mode:</strong> Google Maps API key is missing. Using static fallback map.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Configuration object for map API key to pass to external JS
+    const MAP_CONFIG = {
+        apiKey: "{{ maps_api_key }}",
+        hospitalCenter: { lat: 28.6139, lng: 77.2090 }, // Example coords (New Delhi)
+        hospitalName: "Central Govt Hospital"
+    };
+</script>
+
+{% if maps_api_key and maps_api_key != 'your_google_maps_api_key_here' %}
+<!-- Load Google Maps API (Async) -->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&callback=initMap"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% else %}
+<!-- Fallback if no API key provided -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mapDiv = document.getElementById('hospital-map');
+        // Render a stylized static placeholder
+        mapDiv.style.background = 'url("https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80") center/cover no-repeat';
+        mapDiv.style.position = 'relative';
+        
+        const overlay = document.createElement('div');
+        overlay.style.position = 'absolute';
+        overlay.style.inset = '0';
+        overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+        overlay.style.backdropFilter = 'blur(3px)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.textAlign = 'center';
+        
+        overlay.innerHTML = `
+            <div>
+                <i class="fa-solid fa-map-location-dot text-primary mb-3" style="font-size: 5rem;"></i>
+                <h3 class="fw-bold text-dark">Interactive Map Requires API Key</h3>
+                <p class="text-muted">Please add GOOGLE_MAPS_API_KEY to your .env file to enable live navigation.</p>
+            </div>
+        `;
+        mapDiv.appendChild(overlay);
+        
+        // Basic list interactivity for demo without map
+        setupListInteractivityMock();
+    });
+    
+    function setupListInteractivityMock() {
+        const items = document.querySelectorAll('.dept-item');
+        const search = document.getElementById('map-search');
+        
+        search.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(term) ? 'flex' : 'none';
+            });
+        });
+        
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                items.forEach(i => i.classList.remove('active', 'bg-primary', 'text-white'));
+                item.classList.add('active', 'bg-primary', 'text-white');
+                item.querySelector('.text-muted').classList.replace('text-muted', 'text-white-50');
+                
+                const name = item.querySelector('.fw-medium').textContent;
+                const room = item.getAttribute('data-room');
+                const floor = item.getAttribute('data-floor');
+                
+                document.getElementById('route-info').classList.remove('d-none');
+                document.getElementById('route-target').textContent = `${name} (Room ${room}, Floor ${floor})`;
+            });
+        });
+        
+        document.getElementById('clear-route').addEventListener('click', () => {
+            document.getElementById('route-info').classList.add('d-none');
+            items.forEach(i => {
+                i.classList.remove('active', 'bg-primary', 'text-white');
+                const p = i.querySelector('div small');
+                if(p) p.className = 'text-muted';
+            });
+        });
+    }
+</script>
+{% endif %}
+{% endblock %}

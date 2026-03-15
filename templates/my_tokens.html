@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}My Tokens & Appointments | CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="fw-bold mb-4">My Dashboard</h2>
+
+    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-medium" id="tokens-tab" data-bs-toggle="tab" data-bs-target="#tokens" type="button" role="tab" aria-selected="true">
+                <i class="fa-solid fa-ticket me-2"></i>Live Tokens
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-medium" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-selected="false">
+                <i class="fa-regular fa-calendar-check me-2"></i>Upcoming Appointments
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="dashboardTabsContent">
+        <!-- Tokens Tab -->
+        <div class="tab-pane fade show active" id="tokens" role="tabpanel" aria-labelledby="tokens-tab">
+            <div class="row g-4" id="tokens-container">
+                <!-- Static Example Token 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-primary shadow-sm h-100 position-relative overflow-hidden">
+                        <div class="position-absolute top-0 start-0 w-100 bg-primary" style="height: 5px;"></div>
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="badge bg-primary-light text-primary mb-1">General Medicine</span>
+                                    <h4 class="fw-bold mb-0">Dr. Sarah Jenkins</h4>
+                                    <small class="text-muted">Room 102</small>
+                                </div>
+                                <div class="text-end">
+                                    <p class="text-muted small mb-0">Your Token</p>
+                                    <h2 class="text-primary fw-bold mb-0">#GEN-24</h2>
+                                </div>
+                            </div>
+                            
+                            <hr class="text-muted opacity-25">
+                            
+                            <div class="row text-center mb-4">
+                                <div class="col-6 border-end">
+                                    <small class="text-muted d-block">Serving Now</small>
+                                    <span class="fs-4 fw-bold text-dark">#GEN-22</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Est. Wait</small>
+                                    <span class="fs-4 fw-bold text-dark">10 m</span>
+                                </div>
+                            </div>
+
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="text-center small text-primary fw-medium mb-3">Please proceed to waiting area</p>
+
+                            <div class="d-grid gap-2 text-center">
+                                <a href="{{ url_for('hospital_map') }}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-location-dot me-1"></i> Navigate to Room</a>
+                                <button class="btn btn-link text-danger text-decoration-none btn-sm" onclick="cancelToken(this)">Cancel Token</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Static Example Token 2 (Saved for later) -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4 opacity-75">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="badge bg-light text-muted border mb-1">Pediatrics</span>
+                                    <h5 class="fw-bold mb-0">Dr. Robert Taylor</h5>
+                                    <small class="text-muted">Room 201</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success bg-opacity-10 text-success"><i class="fa-solid fa-check me-1"></i>Completed</span>
+                                </div>
+                            </div>
+                            <hr class="text-muted opacity-25">
+                            <div class="d-flex justify-content-between">
+                                <div class="text-muted small">Token: #PED-05</div>
+                                <div class="text-muted small">Oct 14, 2026</div>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a href="{{ url_for('medical_records') }}" class="btn btn-light btn-sm w-100 border">View Prescription</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Appointments Tab -->
+        <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4 py-3 fw-medium">Ref ID</th>
+                                    <th class="py-3 fw-medium">Doctor / Dept</th>
+                                    <th class="py-3 fw-medium">Date & Time</th>
+                                    <th class="py-3 fw-medium">Status</th>
+                                    <th class="pe-4 py-3 fw-medium text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointments-tbody">
+                                <!-- Static Data Example -->
+                                <tr>
+                                    <td class="ps-4 fw-medium text-primary">APT98231</td>
+                                    <td>
+                                        <div class="fw-bold">Dr. Michael Smith</div>
+                                        <div class="small text-muted">Orthopedic • Room 205</div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fa-regular fa-calendar me-2 text-muted"></i> 20 Oct 2026</div>
+                                        <div class="small text-muted"><i class="fa-regular fa-clock me-2"></i> 10:00 AM</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2"><i class="fa-solid fa-circle-check me-1"></i> Confirmed</span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Manage
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                <li><a class="dropdown-item" href="{{ url_for('hospital_map') }}"><i class="fa-solid fa-map-location-dot me-2 text-muted"></i> Get Directions</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#" onclick="alert('Appointment cancelled'); this.closest('tr').remove();"><i class="fa-solid fa-xmark me-2"></i> Cancel</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="ps-4 fw-medium text-muted">APT12093</td>
+                                    <td>
+                                        <div class="fw-bold">Dr. Emily Chen</div>
+                                        <div class="small text-muted">Dermatology • Room 302</div>
+                                    </td>
+                                    <td>
+                                        <div><i class="fa-regular fa-calendar me-2 text-muted"></i> 05 Oct 2026</div>
+                                        <div class="small text-muted"><i class="fa-regular fa-clock me-2"></i> 02:30 PM</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">Past Visit</span>
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <a href="{{ url_for('medical_records') }}" class="btn btn-outline-secondary btn-sm">Records</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{{ url_for('book_appointment') }}" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Book New Appointment</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function cancelToken(btn) {
+        if(confirm("Are you sure you want to cancel your queue token? This cannot be undone.")) {
+            const card = btn.closest('.col-lg-4');
+            card.innerHTML = `
+                <div class="card border-0 shadow-sm h-100 bg-light">
+                    <div class="card-body p-4 text-center d-flex flex-column align-items-center justify-content-center text-muted">
+                        <i class="fa-solid fa-ban fs-1 mb-2"></i>
+                        <h5>Token Cancelled</h5>
+                        <p class="small">You have left the queue.</p>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => { card.style.display = 'none'; }, 2000);
+        }
+    }
+    
+    // In a real app, fetch tokens and appointments from Firestore here
+    // based on appAuth.currentUser.uid
+</script>
+{% endblock %}

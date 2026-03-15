@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}Home | AI Hospital Scheduler{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary-light py-5 position-relative overflow-hidden">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6 z-1">
+                <span class="badge bg-primary mb-3 py-2 px-3 rounded-pill shadow-sm">
+                    <i class="fa-solid fa-bolt text-warning me-1"></i> Smart Healthcare
+                </span>
+                <h1 class="display-4 fw-bold mb-4">
+                    Skip the Queue with <br/>
+                    <span class="text-gradient">AI Scheduling</span>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Get AI-guided department suggestions, book appointments instantly, and navigate our hospital with ease. Your health deserves speed and precision.
+                </p>
+                <div class="d-flex gap-3 mt-4">
+                    <a href="{{ url_for('book_appointment') }}" class="btn btn-primary btn-lg px-4 shadow-sm">
+                        <i class="fa-solid fa-calendar-check me-2"></i> Book Now
+                    </a>
+                    <button class="btn btn-outline-primary btn-lg px-4 bg-white" onclick="document.getElementById('open-chatbot').click()">
+                        <i class="fa-solid fa-stethoscope me-2"></i> Ask AI Assistant
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0 z-1 d-none d-lg-block">
+                <!-- Using a decorative tech/hospital illustration placeholder -->
+                <div class="position-relative">
+                    <div class="card glass-panel border-0 shadow-lg p-3 position-absolute top-0 start-0 translate-middle" style="width:200px; z-index: 2;">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-user-doctor fs-3 text-primary me-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">200+</h6>
+                                <small class="text-muted">Specialists</small>
+                            </div>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1538108149393-ce17336edcd0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital Technology" class="img-fluid rounded-4 shadow" style="object-fit: cover; height: 500px; width: 100%;">
+                    
+                    <div class="card glass-panel border-0 shadow-lg p-3 position-absolute bottom-0 end-0 translate-middle-y" style="width:220px;">
+                        <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-clock fs-3 text-warning me-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">0 mins</h6>
+                                <small class="text-muted">Waiting Time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Decorative background elements -->
+    <div class="position-absolute top-0 end-0 mt-n5 me-n5 opacity-10" style="z-index: 0;">
+        <i class="fa-solid fa-hospital-user text-primary" style="font-size: 40rem;"></i>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 mt-4">
+    <div class="container">
+        <div class="text-center mb-5 pb-2">
+            <h2 class="fw-bold">How CareSync Works</h2>
+            <p class="text-muted">Four simple steps to a better healthcare experience</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="d-flex justify-content-center">
+                        <div class="feature-icon-wrapper">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-3">1. AI Assessment</h5>
+                    <p class="text-muted mb-0">Describe your symptoms to our AI chatbot. It instantly guides you to the correct specialist department.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="d-flex justify-content-center">
+                        <div class="feature-icon-wrapper text-success bg-success bg-opacity-10">
+                            <i class="fa-solid fa-ticket-simple"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-3">2. Digital Token</h5>
+                    <p class="text-muted mb-0">Generate a live token for OP or book a specific time slot without waiting in long physical queues.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="d-flex justify-content-center">
+                        <div class="feature-icon-wrapper text-warning bg-warning bg-opacity-10">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-3">3. Smart Navigation</h5>
+                    <p class="text-muted mb-0">Don't get lost in the hospital. Get turn-by-turn indoor maps directly to your doctor's room.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 p-4 border-0 shadow-sm text-center">
+                    <div class="d-flex justify-content-center">
+                        <div class="feature-icon-wrapper text-danger bg-danger bg-opacity-10">
+                            <i class="fa-solid fa-file-medical"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold mb-3">4. E-Records</h5>
+                    <p class="text-muted mb-0">All your prescriptions, history, and records are securely stored and accessible anytime.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-white border-top">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-4">Ready to take control of your healthcare?</h2>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 shadow">Create Patient Account</a>
+        <p class="mt-3 text-muted">Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login here</a></p>
+    </div>
+</section>
+{% endblock %}

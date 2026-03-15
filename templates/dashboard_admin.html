@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block title %}Admin Portal | CareSync{% endblock %}
+
+{% block content %}
+<div class="container-fluid bg-light py-4 min-vh-100">
+    <div class="row w-100 mx-auto" style="max-width: 1400px;">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-0">
+                    <div class="p-4 bg-dark text-white text-center rounded-top">
+                        <i class="fa-solid fa-user-shield fa-3x mb-2"></i>
+                        <h5 class="fw-bold mb-0">System Admin</h5>
+                        <small class="text-white-50">Superuser Access</small>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush border-0">
+                    <a href="#" class="list-group-item list-group-item-action active border-0 py-3"><i class="fa-solid fa-chart-line me-2 w-20px text-center"></i> Overview</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3"><i class="fa-solid fa-hospital me-2 w-20px text-center text-muted"></i> Manage Departments</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3"><i class="fa-solid fa-user-doctor me-2 w-20px text-center text-muted"></i> Manage Doctors</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3"><i class="fa-solid fa-users me-2 w-20px text-center text-muted"></i> Patient Database</a>
+                    <a href="#" class="list-group-item list-group-item-action border-0 py-3"><i class="fa-solid fa-gear me-2 w-20px text-center text-muted"></i> System Settings</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Dashboard Overview</h3>
+                <div>
+                   <span class="text-muted small">Hospital Status:</span> <span class="badge bg-success">Operational</span>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-2">Total Patients Today</h6>
+                        <h3 class="fw-bold text-primary mb-0">452</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-2">Active Tokens</h6>
+                        <h3 class="fw-bold text-warning mb-0">87</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-2">Doctors Online</h6>
+                        <h3 class="fw-bold text-success mb-0">24/30</h3>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-2">Appts Booked (Tmrw)</h6>
+                        <h3 class="fw-bold text-dark mb-0">110</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Departments Status -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Department Load Monitor</h5>
+                    <button class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-plus me-1"></i> Add Dept</button>
+                </div>
+                <div class="card-body p-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="text-muted small">
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Doctors Active</th>
+                                    <th>Current Queue</th>
+                                    <th>Wait Time (Avg)</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="fw-medium">OPD</td>
+                                    <td>5 / 5</td>
+                                    <td><span class="badge bg-danger rounded-pill px-2">42 Waiting</span></td>
+                                    <td>25 mins</td>
+                                    <td><i class="fa-solid fa-circle text-danger small"></i> High Load</td>
+                                    <td class="text-end"><button class="btn btn-sm btn-light border">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium">General Medicine</td>
+                                    <td>4 / 4</td>
+                                    <td><span class="badge bg-warning text-dark rounded-pill px-2">22 Waiting</span></td>
+                                    <td>15 mins</td>
+                                    <td><i class="fa-solid fa-circle text-warning small"></i> Moderate</td>
+                                    <td class="text-end"><button class="btn btn-sm btn-light border">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium">Pediatrics</td>
+                                    <td>3 / 3</td>
+                                    <td><span class="badge bg-success rounded-pill px-2">8 Waiting</span></td>
+                                    <td>5 mins</td>
+                                    <td><i class="fa-solid fa-circle text-success small"></i> Normal</td>
+                                    <td class="text-end"><button class="btn btn-sm btn-light border">Manage</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium">Orthopedic</td>
+                                    <td>2 / 3</td>
+                                    <td><span class="badge bg-success rounded-pill px-2">5 Waiting</span></td>
+                                    <td>10 mins</td>
+                                    <td><i class="fa-solid fa-circle text-success small"></i> Normal</td>
+                                    <td class="text-end"><button class="btn btn-sm btn-light border">Manage</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent System Logs -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold mb-0">System Alerts & Logs</h5>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item px-0 py-2 border-0">
+                            <span class="text-danger fw-bold">[ALERT]</span> OPD wait times exceeded 20 minutes threshold.
+                            <span class="float-end text-muted">10:45 AM</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 border-0">
+                            <span class="text-success fw-bold">[INFO]</span> Dr. Emily Chen logged in (Dermatology).
+                            <span class="float-end text-muted">09:00 AM</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 border-0">
+                            <span class="text-warning fw-bold">[WARN]</span> Database sync delay detected (Firebase). Auto-resolved.
+                            <span class="float-end text-muted">08:15 AM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

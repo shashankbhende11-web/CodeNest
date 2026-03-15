@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Patient Registration | CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-0 text-center pt-4 pb-0">
+                    <h3 class="fw-bold mb-1">Create Patient Account</h3>
+                    <p class="text-muted small">Register to skip the queue and manage your health</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Error Alert -->
+                    <div id="register-error" class="alert alert-danger d-none small py-2" role="alert"></div>
+
+                    <form id="register-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="reg-fname" class="form-label fw-medium small">First Name</label>
+                                <input type="text" class="form-control" id="reg-fname" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="reg-lname" class="form-label fw-medium small">Last Name</label>
+                                <input type="text" class="form-control" id="reg-lname" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reg-email" class="form-label fw-medium small">Email address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" class="form-control border-start-0" id="reg-email" placeholder="name@example.com" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="reg-phone" class="form-label fw-medium small">Phone Number</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                                    <input type="tel" class="form-control border-start-0" id="reg-phone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="reg-dob" class="form-label fw-medium small">Date of Birth</label>
+                                <input type="date" class="form-control" id="reg-dob" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-medium small d-block">Gender</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reg-gender" id="gender-male" value="Male" checked>
+                                    <label class="form-check-label small" for="gender-male">Male</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reg-gender" id="gender-female" value="Female">
+                                    <label class="form-check-label small" for="gender-female">Female</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="reg-gender" id="gender-other" value="Other">
+                                    <label class="form-check-label small" for="gender-other">Other</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="reg-password" class="form-label fw-medium small">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0" id="reg-password" placeholder="Min. 8 characters" required minlength="8">
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" value="" id="reg-terms" required>
+                            <label class="form-check-label small text-muted" for="reg-terms">
+                                I agree to the <a href="#" class="text-primary text-decoration-none">Terms of Service</a> and <a href="#" class="text-primary text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2" id="reg-btn-submit">
+                            <span class="spinner-border spinner-border-sm d-none me-2" id="reg-spinner" role="status" aria-hidden="true"></span>
+                            Create Account
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary fw-medium text-decoration-none">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const registerForm = document.getElementById("register-form");
+        const errorAlert = document.getElementById("register-error");
+        const submitBtn = document.getElementById("reg-btn-submit");
+        const spinner = document.getElementById("reg-spinner");
+
+        if(registerForm) {
+            registerForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById("reg-email").value;
+                const password = document.getElementById("reg-password").value;
+                const fname = document.getElementById("reg-fname").value;
+                const lname = document.getElementById("reg-lname").value;
+                const phone = document.getElementById("reg-phone").value;
+                const dob = document.getElementById("reg-dob").value;
+                const genderElement = document.querySelector('input[name="reg-gender"]:checked');
+                const gender = genderElement ? genderElement.value : 'Not specified';
+                
+                // Reset error
+                errorAlert.classList.add("d-none");
+                errorAlert.textContent = "";
+                
+                // Show loading
+                submitBtn.disabled = true;
+                spinner.classList.remove("d-none");
+                
+                try {
+                    if (typeof appAuth === 'undefined' || typeof appDb === 'undefined') {
+                        throw new Error("Firebase SDKs not initialized properly.");
+                    }
+                    
+                    // Create auth user
+                    const userCredential = await appAuth.createUserWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+                    
+                    // Add patient details to Firestore
+                    await appDb.collection("patients").doc(user.uid).set({
+                        uid: user.uid,
+                        firstName: fname,
+                        lastName: lname,
+                        email: email,
+                        phone: phone,
+                        dob: dob,
+                        gender: gender,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        role: "patient"
+                    });
+                    
+                    // Optional: Update auth profile
+                    await user.updateProfile({
+                        displayName: `${fname} ${lname}`
+                    });
+                    
+                    // Redirect to dashboard
+                    window.location.href = "{{ url_for('dashboard_patient') }}";
+                    
+                } catch (error) {
+                    console.error("Registration Error:", error);
+                    errorAlert.textContent = error.message;
+                    errorAlert.classList.remove("d-none");
+                    submitBtn.disabled = false;
+                    spinner.classList.add("d-none");
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

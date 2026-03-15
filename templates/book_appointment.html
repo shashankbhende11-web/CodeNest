@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% block title %}Book Appointment | CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
+                    <span class="badge bg-primary-light text-primary mb-2 py-2 px-3 rounded-pill">Appointment Booking</span>
+                    <h3 class="fw-bold mb-1">Schedule a Visit</h3>
+                    <p class="text-muted small">Select your preferred date, time, and doctor</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    
+                    <div id="booking-success" class="alert alert-success d-none mb-4 shadow-sm" role="alert">
+                        <i class="fa-solid fa-circle-check me-2"></i> <strong>Appointment Confirmed!</strong> Your booking reference is <span id="ref-num" class="fw-bold text-dark"></span>. 
+                        <a href="{{ url_for('medical_records') }}" class="alert-link">View your appointments.</a>
+                    </div>
+
+                    <form id="booking-form">
+                        <div class="row g-4 mb-4">
+                            <!-- Department Selection -->
+                            <div class="col-md-6">
+                                <label for="book-dept" class="form-label fw-medium small">Department</label>
+                                <select class="form-select" id="book-dept" required>
+                                    <option value="" selected disabled>Select Department</option>
+                                    <option value="OPD">OPD</option>
+                                    <option value="Orthopedic">Orthopedic</option>
+                                    <option value="Dermatology">Dermatology</option>
+                                    <option value="Gynecology">Gynecology</option>
+                                    <option value="General Medicine">General Medicine</option>
+                                    <option value="Pediatrics">Pediatrics</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Doctor Selection -->
+                            <div class="col-md-6">
+                                <label for="book-doc" class="form-label fw-medium small">Doctor</label>
+                                <select class="form-select" id="book-doc" required>
+                                    <option value="" selected disabled>Select Doctor</option>
+                                    <!-- Dynamic based on dept -->
+                                    <option data-dept="OPD" value="Dr. John Doe">Dr. John Doe (OPD)</option>
+                                    <option data-dept="Orthopedic" value="Dr. Michael Smith">Dr. Michael Smith (Orthopedic)</option>
+                                    <option data-dept="Dermatology" value="Dr. Emily Chen">Dr. Emily Chen (Dermatology)</option>
+                                    <option data-dept="Gynecology" value="Dr. Lisa Wong">Dr. Lisa Wong (Gynecology)</option>
+                                    <option data-dept="General Medicine" value="Dr. Sarah Jenkins">Dr. Sarah Jenkins (General Medicine)</option>
+                                    <option data-dept="Pediatrics" value="Dr. Robert Taylor">Dr. Robert Taylor (Pediatrics)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <!-- Date Selection -->
+                            <div class="col-md-6">
+                                <label for="book-date" class="form-label fw-medium small">Preferred Date</label>
+                                <input type="date" class="form-control" id="book-date" required>
+                            </div>
+                            
+                            <!-- Time Slot Selection -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium small">Available Time Slots</label>
+                                <div class="row g-2" id="time-slots">
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="timeSlot" id="slot1" value="09:00 AM" autocomplete="off" required>
+                                        <label class="btn btn-outline-primary w-100 py-2 small" for="slot1">09:00 AM</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="timeSlot" id="slot2" value="10:00 AM" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100 py-2 small" for="slot2">10:00 AM</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="timeSlot" id="slot3" value="11:30 AM" autocomplete="off" disabled>
+                                        <label class="btn btn-outline-secondary w-100 py-2 small" for="slot3">11:30 AM <br><small>Full</small></label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="timeSlot" id="slot4" value="01:00 PM" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100 py-2 small" for="slot4">01:00 PM</label>
+                                    </div>
+                                    <div class="col-4">
+                                        <input type="radio" class="btn-check" name="timeSlot" id="slot5" value="02:30 PM" autocomplete="off">
+                                        <label class="btn btn-outline-primary w-100 py-2 small" for="slot5">02:30 PM</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="book-reason" class="form-label fw-medium small">Reason for Visit (Symptoms)</label>
+                            <textarea class="form-control" id="book-reason" rows="3" placeholder="Briefly describe your symptoms..."></textarea>
+                        </div>
+
+                        <hr class="mb-4">
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="book-btn-submit">
+                            <span class="spinner-border spinner-border-sm d-none me-2" id="book-spinner" role="status" aria-hidden="true"></span>
+                            Confirm Appointment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Pre-fill from URL parameters (e.g. from Dashboard or Chatbot)
+        const urlParams = new URLSearchParams(window.location.search);
+        const deptParam = urlParams.get('dept');
+        const docParam = urlParams.get('doc');
+        
+        const deptSelect = document.getElementById('book-dept');
+        const docSelect = document.getElementById('book-doc');
+        
+        // Filter doctors based on department
+        function filterDoctors() {
+            const selectedDept = deptSelect.value;
+            Array.from(docSelect.options).forEach(opt => {
+                if(opt.value === "") return; // Skip placeholder
+                if(opt.getAttribute('data-dept') === selectedDept) {
+                    opt.style.display = 'block';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+            // Reset doc selection if hidden
+            if(docSelect.selectedOptions[0].style.display === 'none') {
+                docSelect.value = "";
+            }
+        }
+        
+        deptSelect.addEventListener('change', filterDoctors);
+        
+        if (deptParam) {
+            // Un-format URL string (OPD -> OPD, General_Medicine -> General Medicine)
+            const cleanDept = deptParam.replace(/_/g, ' ');
+            Array.from(deptSelect.options).forEach(opt => {
+                if(opt.value.toLowerCase() === cleanDept.toLowerCase()) {
+                    deptSelect.value = opt.value;
+                }
+            });
+            filterDoctors();
+        }
+        
+        if (docParam) {
+            const cleanDoc = docParam.replace(/_/g, ' ');
+            Array.from(docSelect.options).forEach(opt => {
+                if(opt.value.toLowerCase() === cleanDoc.toLowerCase()) {
+                    docSelect.value = opt.value;
+                }
+            });
+        }
+        
+        // Set min date to today
+        const dateInput = document.getElementById('book-date');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+        dateInput.value = today;
+
+        // Form Submit
+        const form = document.getElementById('booking-form');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('book-btn-submit');
+            const spinner = document.getElementById('book-spinner');
+            const successMsg = document.getElementById('booking-success');
+            
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            
+            const dept = deptSelect.value;
+            const doc = docSelect.value;
+            const date = dateInput.value;
+            const timeElement = document.querySelector('input[name="timeSlot"]:checked');
+            const time = timeElement ? timeElement.value : 'No time selected';
+            const reason = document.getElementById('book-reason').value;
+            
+            // Simulating API call/Firestore delay
+            setTimeout(async () => {
+                try {
+                    const refId = "APT" + Math.floor(100000 + Math.random() * 900000);
+                    
+                    if (typeof appAuth !== 'undefined' && appAuth.currentUser && typeof appDb !== 'undefined') {
+                        // Save to Firebase
+                        await appDb.collection("appointments").add({
+                            userId: appAuth.currentUser.uid,
+                            department: dept,
+                            doctor: doc,
+                            date: date,
+                            time: time,
+                            reason: reason,
+                            referenceId: refId,
+                            status: 'confirmed',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        console.warn("User not logged in or Firebase not ready. Simulating success anyway.");
+                    }
+                    
+                    form.reset();
+                    successMsg.classList.remove('d-none');
+                    document.getElementById('ref-num').textContent = refId;
+                    
+                    // scroll to top
+                    window.scrollTo(0,0);
+                    
+                } catch(error) {
+                    alert("Error booking: " + error.message);
+                } finally {
+                    btn.disabled = false;
+                    spinner.classList.add('d-none');
+                }
+            }, 1500);
+        });
+    });
+</script>
+{% endblock %}

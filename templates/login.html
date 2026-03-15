@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Patient Login | CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-0 text-center pt-4 pb-0">
+                    <h3 class="fw-bold mb-1">Welcome Back</h3>
+                    <p class="text-muted small">Login to access your dashboard and records</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Error Alert -->
+                    <div id="login-error" class="alert alert-danger d-none small py-2" role="alert"></div>
+
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label fw-medium small">Email address</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" class="form-control border-start-0" id="login-email" placeholder="name@example.com" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="login-password" class="form-label fw-medium small">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                <input type="password" class="form-control border-start-0" id="login-password" placeholder="••••••••" required>
+                            </div>
+                            <div class="text-end mt-1">
+                                <a href="#" class="text-decoration-none small text-primary">Forgot password?</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2" id="login-btn-submit">
+                            <span class="spinner-border spinner-border-sm d-none me-2" id="login-spinner" role="status" aria-hidden="true"></span>
+                            Login securely <i class="fa-solid fa-arrow-right-to-bracket ms-1"></i>
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-0">Don't have an account? <a href="{{ url_for('register') }}" class="text-primary fw-medium text-decoration-none">Sign up here</a></p>
+                        <p class="text-muted small mt-2">Doctor or Admin <a href="#" class="text-secondary text-decoration-none">Login Here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const loginForm = document.getElementById("login-form");
+        const errorAlert = document.getElementById("login-error");
+        const submitBtn = document.getElementById("login-btn-submit");
+        const spinner = document.getElementById("login-spinner");
+
+        if(loginForm) {
+            loginForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById("login-email").value;
+                const password = document.getElementById("login-password").value;
+                
+                // Reset error state
+                errorAlert.classList.add("d-none");
+                errorAlert.textContent = "";
+                
+                // Show loading
+                submitBtn.disabled = true;
+                spinner.classList.remove("d-none");
+                
+                try {
+                    // Call standard Firebase auth
+                    if (typeof appAuth !== 'undefined') {
+                        const userCredential = await appAuth.signInWithEmailAndPassword(email, password);
+                        // Store minimal state in localStorage or session if needed
+                        // Typically firebase keeps local token
+                        
+                        // Redirect to patient dashboard
+                        window.location.href = "{{ url_for('dashboard_patient') }}";
+                    } else {
+                        throw new Error("Firebase not initialized properly.");
+                    }
+                } catch (error) {
+                    console.error("Login Error:", error);
+                    errorAlert.textContent = error.message;
+                    errorAlert.classList.remove("d-none");
+                    submitBtn.disabled = false;
+                    spinner.classList.add("d-none");
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
