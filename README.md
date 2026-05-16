@@ -1,6 +1,6 @@
 # Cloud-Based Office Administration Management System
 
-## Internship Project - Week 1
+## Internship Project
 
 A scalable full-stack web application for managing student internships.
 
